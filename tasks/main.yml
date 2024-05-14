@@ -1,0 +1,39 @@
+---
+- name: Ensure app packages are installed
+  become: true
+  ansible.builtin.package:
+    name: "{{ app_packages + app_default_packages }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Use setuptools
+  when: app_use_setuptools
+  block:
+    - name: Install build modules
+      become: true
+      become_user: "{{ app_user }}"
+      ansible.builtin.pip:
+        name:
+          - setuptools
+          - wheel
+          - build
+        virtualenv: "{{ app_virtualenv }}"
+        virtualenv_command: "{{ app_virtualenv_command }}"
+
+    - name: Install app in virtualenv
+      become: true
+      become_user: "{{ app_user }}"
+      ansible.builtin.pip:
+        name: "{{ app_basepath }}"
+        virtualenv: "{{ app_virtualenv }}"
+        virtualenv_command: "{{ app_virtualenv_command }}"
+
+- name: Install requirements
+  become: true
+  become_user: "{{ app_user }}"
+  ansible.builtin.pip:
+    requirements: "{{ app_requirements_file }}"
+    virtualenv: "{{ app_virtualenv }}"
+    virtualenv_command: "{{ app_virtualenv_command }}"
+  when: not app_use_setuptools

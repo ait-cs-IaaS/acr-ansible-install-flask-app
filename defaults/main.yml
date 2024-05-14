@@ -1,0 +1,17 @@
+---
+app_user: "{{ app_name }}"
+app_basepath: /opt/{{ app_name }}
+
+app_python_version: "3.9"
+app_packages: []
+app_default_packages:
+  - python{{ app_python_version }}
+  - python3-pip
+  - python{{ app_python_version }}-venv
+  - nginx
+
+app_requirements_file: "{{ app_basepath }}/requirements.txt"
+app_virtualenv: "{{ app_basepath }}/venv"
+app_virtualenv_command: python3.9 -m venv
+
+app_use_setuptools: false
